@@ -79,9 +79,8 @@ void oddEvenSort(int arr_len, int *arr)
 }
 
 
-/**   
+/** Best: n, Worst: n^2, Avg: nlgn
  * Like a better version of bubbleSort.
- * Best: n, Worst: n^2, Avg: nlgn
  */
 void combSort(int arr_len, int *arr)
 {
@@ -148,7 +147,7 @@ void quickSort(int arr_len, int *arr)
   RECquickSort(arr, 0, arr_len-1);
 }
 
-int min(int a, int b){ return (a<b) ? a : b; }
+#define min(a, b) (((a)<(b)) ? (a) : (b))
 
 /** Best: nlgn, Worst: nlgn, Avg: nlgn */
 void mergeSort(int arr_len, int *arr)
@@ -181,7 +180,8 @@ void mergeSort(int arr_len, int *arr)
   }
 }
 
-static void RECflashSort(int arr[], int arr_len, int m)
+/* neuberts algorithm translated into C by Michael Sahota -- modifications by F. Fitzgerald */
+static void RECflashSort(int arr[], int arr_len, int m_classes)
 {
   int THRESHOLD = 75; /** if two adjacent values in vector are greater than this then we recurse???? idk why */
   int CLASS_SIZE = 75; /** min value of m */
@@ -199,61 +199,66 @@ static void RECflashSort(int arr[], int arr_len, int m)
   // All the numbers are identical, the list is already sorted
   if (arr[nmax] == arr[nmin]) return;
 
-  /** c1 is coefficient for expected index for a value ex. [1,4,6] (3-1)/(6-1) = 0.4
-   * so that taking floor(val - min) == [(1-1)*0.4, (4-1)*0.4, (6-1)*0.4] = [0,1,2] ie the expected index for each val
-  */
-  float coeff_index = (m-1.0) / (arr[nmax]-arr[nmin]);
   int min_val = arr[nmin];
 
+  /** 
+   * coefficient for expected index for a value ex. [1,4,6] (3-1)/(6-1) = 0.4
+   * so that taking floor(val - min) == [(1-1)*0.4, (4-1)*0.4, (6-1)*0.4] = [0,1,2] 
+   * ie the expected index for each val
+  */
+  float coeff_index = (m_classes - 1.0) / (arr[nmax] - min_val);
+
   /** allocate space for the l vector */
-  int * l = calloc(m,sizeof(int));
+  int * l = calloc(m_classes, sizeof(int));
   l[0] = -1; /* since the base of the "a" (data) array is 0 */
-  //for (int k=1; k < m; k++) l[k] = 0; //?? no need for this since calloc zeros memory already??
 
   for (int i = 0; i < arr_len; i++){
     int exp_index = floor(coeff_index * (arr[i] - min_val)); //expected index
-    l[exp_index] += 1; //population of expected index
+    l[exp_index] += 1; //population of class index
   }
 
-  for (int k = 1; k < m ; k++) l[k] += l[k-1]; //sum adj populations
+  for (int k = 1; k < m_classes ; k++) l[k] += l[k-1];
 
   swap(&arr[nmax], &arr[0]); //sort largest element
   render(arr, 1);
 
   /**** PERMUTATION *****/
+  /* moving elements into the correct class */
   int nmove = 0;
-  int j = 0;
+  int j = 0; //index of cycle leader
   int flash;
-  int k = m-1;
+  int exp_index = m_classes - 1; //last index
 
-  while(nmove <  arr_len){
-    while(j  >  l[k]){
+  //scan through array
+  while(nmove < arr_len){
+    while(j > l[exp_index]){
       j++;
-      k = floor(coeff_index * (arr[j] - min_val));
+      exp_index = floor(coeff_index * (arr[j] - min_val));
     }
 
-    flash = arr[j];
+    flash = arr[j]; //cycle leader
 
-    while(j <=  l[k]){
-      k = floor(coeff_index * (flash - min_val));
-      swap(&arr[l[k]], &flash);
+    while(j <= l[exp_index]){
+      exp_index = floor(coeff_index * (flash - min_val));
+      swap(&arr[l[exp_index]], &flash);
       render(arr, 1);
-      l[k]--;
+      l[exp_index]--;
       nmove++;
     }
   }
 
   /**** Choice of RECURSION or STRAIGHT INSERTION *****/
-  for (k = 0; k<(m-1); k++){
+  for (int k = 0; k<(m_classes - 1); k++){
     int nx;
-    if ((nx  =  l[k+1] - l[k]) > THRESHOLD ){  /* then use recursion */
+    if ((nx = l[k+1] - l[k]) > THRESHOLD ){  /* then use recursion */
       RECflashSort(&arr[l[k]+1], nx, CLASS_SIZE);
-    }else{  /* use insertion sort */
-      for (i = l[k+1]-1; i > l[k] ; i--){
+    }else{  
+      /* use insertion sort */
+      for (int i = l[k+1]-1; i > l[k]; i--){
         if (arr[i] > arr[i+1]){
           int hold = arr[i];
           j = i;
-          while(hold  >  arr[j+1]){
+          while(hold > arr[j+1]){
             arr[j] = arr[j+1];
             j++;
             render(arr, 1);
@@ -270,8 +275,7 @@ static void RECflashSort(int arr[], int arr_len, int m)
 /** Best: n, Worst: n^2, Avg: n+r
  * sorts in n with O(1+m) memory when data is uniformly distributed by calculating expected index for each value
  * worst performance is when not uniformly distributed
- * neuberts algorithm translated into C by Michael Sahota -- modification by me
- * sorts array by use of index vector l of dimension m, with m about 0.42 n // says 0.1 n on neuberts page
+ * sorts array by use of index vector l of dimension m, with m about 0.42 n // says 0.43 n on neuberts page
  * THRESHOLD is very important as it is the min number of elements required in subclass before recursion is used
 */
 void flashSort(int arr_len, int *arr)
@@ -280,7 +284,7 @@ void flashSort(int arr_len, int *arr)
 }
 
 /** Best: n^2, Worst: n^2, Avg: n^2
-    comparison sort theoretically optimal in terms of total number of writes
+ * comparison sort theoretically optimal in terms of total number of writes
 */
 void cycleSort(int arr_len, int *arr)
 {
@@ -340,7 +344,7 @@ void countSort(int arr_len, int *arr)
 }
 
 
-/* shitty sorts */
+/* amusing sorts */
 
 /** Best: n, Worst: n^2, Avg: n^2 */
 void gnomeSort(int arr_len, int *arr)
