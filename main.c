@@ -50,10 +50,20 @@ int quit(void)
   exit(EXIT_SUCCESS);
 }
 
-void random_vals(int max_val, int arr_len, int *arr)
+void all_vals_out_of_order(int max_val, int arr_len, int *arr)
 {
   for(int i=0;i<arr_len;i++) arr[i] = (i * max_val) / arr_len;
   for(int i=0;i<arr_len;i++) swap(&arr[rand()%arr_len], &arr[i]);
+}
+
+void rand_vals(int max_val, int arr_len, int *arr)
+{
+  for(int i=0;i<arr_len;i++) arr[i] = ((float)rand()/RAND_MAX) * max_val;
+}
+
+void random_vals(int max_val, int arr_len, int *arr)
+{
+  rand_vals(max_val, arr_len, arr);
 }
 
 void render(int *arr, int delay)
@@ -63,9 +73,9 @@ void render(int *arr, int delay)
 
   //render funcs
   int n = WIN_W/LINE_W;
-  SDL_SetRenderDrawColor(renderer, 0xFF,0x33,0x22,0xFF);
+  //SDL_SetRenderDrawColor(renderer, 0xFF,0x33,0x22,0xFF);
   for(int i=0; i < n; i++){
-    //SDL_SetRenderDrawColor(renderer, arr[i], 0xC0, 0x80, 0xFF);
+    SDL_SetRenderDrawColor(renderer, (arr[i] * 0xFF) / WIN_H, 0x33, 0x22, 0xFF);
     SDL_Rect rect = {i*LINE_W, WIN_H-arr[i], LINE_W, arr[i]};
     SDL_RenderFillRect(renderer, &rect);
   }
@@ -84,6 +94,7 @@ void render(int *arr, int delay)
 
   SDL_RenderPresent(renderer);
 
+  //check for event
   SDL_Event ev;
   SDL_WaitEventTimeout(&ev, delay);
   switch(ev.type){
@@ -113,6 +124,7 @@ void run_loop(int arr_len, int* array)
   if(!sigsetjmp(resume_here, 1)){ 
     (*sort_funcs[gSortInd])(arr_len, array); 
 
+    //wait for event before exiting
     SDL_Event ev;
     while(1){
       SDL_WaitEvent(&ev);
