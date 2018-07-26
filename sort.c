@@ -154,15 +154,15 @@ void mergeSort(int arr_len, int *arr)
 {
   int work_array[arr_len];
   for(int width=1; width < arr_len; width *= 2){
-    for(int i=0; i < arr_len; i += 2*width){
+    for(int left=0; left < arr_len; left += 2*width){
       //bottom up merge
-      int left = i;
-      int right = min(i+width, arr_len);
-      int end = min(i+2*width, arr_len);
+      int mid = min(left+width, arr_len);
+      int end = min(left+2*width, arr_len);
       int p = left;
-      int q = right;
+      int q = mid;
       for(int k = left; k < end; k++){
-        if(p < right && (q >= end || arr[p] <= arr[q])){
+        //sort left and right
+        if(p < mid && (q >= end || arr[p] <= arr[q])){
           work_array[k] = arr[p];
           p++;
         }else{
@@ -170,11 +170,11 @@ void mergeSort(int arr_len, int *arr)
           q++;
         }
       }
-    }
 
-    //copyarray
-    for(int k=0; k<arr_len; k++){
-      arr[k] = work_array[k];
+      //copyarray
+      for(int k=left; k<end; k++){
+        arr[k] = work_array[k];
+      }
       render(arr, 1);
     }
   }
