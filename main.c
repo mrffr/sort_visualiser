@@ -36,8 +36,9 @@ const char * name_sort_funcs[] = {
 
 int gSortInd = 0;
 
-//this allows me to skip to next sort func even though render loop is called from inside sort function itself
-//particularly needed for the joke sort functions
+// this allows me to skip to next sort func even though render loop is called 
+// from inside sort function itself
+// particularly needed for the joke sort functions
 sigjmp_buf resume_here; 
 
 /////////////////////////////////////////
@@ -56,14 +57,9 @@ void all_vals_out_of_order(int max_val, int arr_len, int *arr)
   for(int i=0;i<arr_len;i++) swap(&arr[rand()%arr_len], &arr[i]);
 }
 
-void rand_vals(int max_val, int arr_len, int *arr)
-{
-  for(int i=0;i<arr_len;i++) arr[i] = ((float)rand()/RAND_MAX) * max_val;
-}
-
 void random_vals(int max_val, int arr_len, int *arr)
 {
-  rand_vals(max_val, arr_len, arr);
+  for(int i=0;i<arr_len;i++) arr[i] = ((float)rand()/RAND_MAX) * max_val;
 }
 
 void render(int *arr, int delay)
@@ -82,7 +78,9 @@ void render(int *arr, int delay)
 
   //render text
   SDL_Surface *ts = NULL;
-  ts = TTF_RenderText_Blended(FONT, name_sort_funcs[gSortInd], (SDL_Color){0xFF, 0xFF, 0xFF, 0xFF});
+  ts = TTF_RenderText_Blended(FONT, 
+      name_sort_funcs[gSortInd], 
+      (SDL_Color){0xFF, 0xFF, 0xFF, 0xFF});
 
   SDL_Texture *t = SDL_CreateTextureFromSurface(renderer, ts);
   if(!t) return;
@@ -146,6 +144,8 @@ void run_loop(int arr_len, int* array)
       }
     }
   }
+  printf("skip\n"); //TODO determine why this is needed to prevent skipping multiple sorts
+  return;
 }
 
 int main(void)
