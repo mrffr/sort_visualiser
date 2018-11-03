@@ -6,4 +6,4 @@ Visualise various sorting algorithms.
 q - quit  
 any key - skip to next algorithm.
 
-Actual timing is not that accurate as it's more for demonstration.
+Actual timing is not accurate at all as it's purely for visual demonstration.
