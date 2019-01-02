@@ -27,11 +27,11 @@ sort_fun sort_funcs[] = {
 };
 
 const char * name_sort_funcs[] = {
-  "quickSort", "insertionSort", "selectionSort",
-  "bubbleSort", "cycleSort", "countSort",
-  "flashSort", "oddEvenSort", "mergeSort",
-  "shellSort", "combSort", "gnomeSort",
-  "stoogeSort", "monkeySort"
+  "quickSort: nlgn, n^2", "insertionSort: n, n^2", "selectionSort: n^2",
+  "bubbleSort: n, n^2", "cycleSort: n^2", "countSort: n, n^2",
+  "flashSort: n, n^2, n+r", "oddEvenSort: n, n^2", "mergeSort: nlgn",
+  "shellSort: nlgn, n^2, nlg^2n", "combSort: n, n^2, nlgn", "gnomeSort: n, n^2",
+  "stoogeSort: n^2.7", "monkeySort: n, n*n!"
 };
 
 int gSortInd = 0;
@@ -78,9 +78,10 @@ void render(int *arr, int delay)
 
   //render text
   SDL_Surface *ts = NULL;
+  SDL_Color white = {0xFF, 0xFF, 0xFF, 0xFF};
   ts = TTF_RenderText_Blended(FONT, 
       name_sort_funcs[gSortInd], 
-      (SDL_Color){0xFF, 0xFF, 0xFF, 0xFF});
+      white);
 
   SDL_Texture *t = SDL_CreateTextureFromSurface(renderer, ts);
   if(!t) return;

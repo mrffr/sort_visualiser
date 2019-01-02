@@ -14,7 +14,7 @@ void insertionSort(int arr_len, int *arr)
     while(j >= 0 && arr[j] > x){
       arr[j+1] = arr[j];
       j--;
-      render(arr, 1);
+      //render(arr, 1);
     }
     arr[j+1] = x;
     render(arr, 1);
@@ -32,7 +32,7 @@ void selectionSort(int arr_len, int *arr)
     }
     if(min != i){
       swap(&arr[min], &arr[i]);
-      render(arr, 10);
+      render(arr, 1);
     }
   }
 }
@@ -115,7 +115,7 @@ void shellSort(int arr_len, int *arr)
       int j;
       for(j=i; j >= gap && arr[j - gap] > temp; j -= gap){
         arr[j] = arr[j - gap];
-        render(arr,1);
+        //render(arr,1);
       }
       arr[j] = temp;
       render(arr,1);
