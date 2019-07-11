@@ -1,5 +1,5 @@
 # Sort Visualiser
-Visualise various sorting algorithms.
+Visualise various sorting algorithms using SDL.
 
 ![Example](/example.jpg)
 
